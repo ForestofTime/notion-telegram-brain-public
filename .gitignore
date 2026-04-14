@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+logs/
+*.log
+.DS_Store
+
+# Real runtime index should never be committed
+data/*.json
+!data/example-index.json

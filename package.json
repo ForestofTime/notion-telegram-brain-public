@@ -1,0 +1,27 @@
+{
+  "name": "notion-telegram-brain-public",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node --enable-source-maps dist/index.js",
+    "start:daemon": "bash ./scripts/run-forever.sh",
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "sync:full": "tsx src/full-sync.ts",
+    "security:scan": "bash ./scripts/security-scan.sh"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "dotenv": "^16.4.5",
+    "fuse.js": "^7.0.0",
+    "notion-to-md": "^3.1.4",
+    "telegraf": "^4.16.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

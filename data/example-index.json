@@ -1,0 +1,18 @@
+{
+  "lastSyncAt": "2026-01-01T00:00:00.000Z",
+  "docs": [
+    {
+      "id": "example-page-001",
+      "title": "发货通知单自动关闭规则（示例）",
+      "url": "https://www.notion.so/example-page-001",
+      "lastEditedTime": "2026-01-01T00:00:00.000Z",
+      "createdTime": "2026-01-01T00:00:00.000Z",
+      "kind": "page",
+      "parentType": "workspace",
+      "markdown": "## 自动关闭规则\n\n1. 下游无提交状态出库单\n2. 数量差值满足阈值",
+      "contentText": "自动关闭规则 下游无提交状态出库单 数量差值满足阈值",
+      "distilled": "系统按规则每日校验后自动关闭符合条件的发货通知单。",
+      "preview": "自动关闭规则 下游无提交状态出库单 数量差值满足阈值"
+    }
+  ]
+}
