@@ -18,7 +18,7 @@ export class NotionSyncService {
     this.store = store;
   }
 
-  async sync(options: SyncOptions = {}): Promise<{ scanned: number; indexed: number; lastSyncAt: string }> {
+  async sync(options: SyncOptions = {}): Promise<{ scanned: number; indexed: number; lastSyncAt: string; changedDocs: NotionDoc[] }> {
     const current = await this.store.read();
     const lastSyncAt = options.forceFull ? null : current.lastSyncAt;
 
@@ -65,7 +65,7 @@ export class NotionSyncService {
 
     const syncedAt = new Date().toISOString();
     const merged = await this.store.upsertDocs(docs, syncedAt);
-    return { scanned, indexed: merged.docs.length, lastSyncAt: syncedAt };
+    return { scanned, indexed: merged.docs.length, lastSyncAt: syncedAt, changedDocs: docs };
   }
 
   private async toDoc(item: any): Promise<NotionDoc> {

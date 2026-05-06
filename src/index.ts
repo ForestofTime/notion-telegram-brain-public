@@ -1,6 +1,7 @@
-import { config } from "./config.js";
-import { NotionSyncService } from "./notion-sync.js";
 import { NotionTelegramBot } from "./bot.js";
+import { config } from "./config.js";
+import { BrainDB } from "./db.js";
+import { NotionSyncService } from "./notion-sync.js";
 import { JsonStore } from "./store.js";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
@@ -34,8 +35,20 @@ const launchBotWithRetry = async (bot: NotionTelegramBot, maxAttempts = 8): Prom
 
 const main = async (): Promise<void> => {
   const store = new JsonStore(config.dataFile);
+  const db = new BrainDB(config.sqliteFile);
   const syncService = new NotionSyncService(config.notionToken, store);
-  const bot = new NotionTelegramBot(store, syncService);
+  const bot = new NotionTelegramBot(store, syncService, db);
+
+  try {
+    const seed = await store.read();
+    if (seed.docs.length > 0) {
+      db.upsertDocs(seed.docs);
+      console.log(`[boot] 已将现有 JSON 索引灌入 SQLite: ${seed.docs.length} docs`);
+    }
+  } catch (err) {
+    console.warn(`[boot] 灌入 SQLite 失败: ${(err as Error).message}`);
+  }
+
   let botRunning = false;
 
   if (config.telegramMode === "sync-only") {
@@ -63,45 +76,40 @@ const main = async (): Promise<void> => {
     }
   }
 
-  // 启动后异步同步，避免首轮同步阻塞机器人可用性
   const bootTimer = setTimeout(async () => {
     console.log("[boot] 启动后执行一次同步...");
     try {
       const r = await syncService.sync({ forceFull: false });
+      db.upsertDocs(r.changedDocs);
       console.log(`[sync] 扫描 ${r.scanned}, 索引 ${r.indexed}`);
     } catch (err) {
       console.error("[sync] 启动同步失败:", (err as Error).message);
     }
   }, 0);
-  if (botRunning) {
-    bootTimer.unref();
-  }
+  if (botRunning) bootTimer.unref();
 
   const intervalMs = config.syncIntervalMinutes * 60 * 1000;
   const periodicTimer = setInterval(async () => {
     try {
       const r = await syncService.sync({ forceFull: false });
+      db.upsertDocs(r.changedDocs);
       console.log(`[sync] 增量完成 扫描 ${r.scanned}, 索引 ${r.indexed}, 时间 ${r.lastSyncAt}`);
     } catch (err) {
       console.error("[sync] 定时同步失败:", (err as Error).message);
     }
   }, intervalMs);
-  if (botRunning) {
-    periodicTimer.unref();
-  }
+  if (botRunning) periodicTimer.unref();
 
   const shutdown = async (signal: string): Promise<void> => {
     console.log(`[bot] 收到 ${signal}，准备退出`);
-    if (botRunning) {
-      await bot.stop(signal);
-    }
+    if (botRunning) await bot.stop(signal);
+    db.close();
     process.exit(0);
   };
 
   process.once("SIGINT", () => {
     void shutdown("SIGINT");
   });
-
   process.once("SIGTERM", () => {
     void shutdown("SIGTERM");
   });

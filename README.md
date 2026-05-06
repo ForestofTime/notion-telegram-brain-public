@@ -8,7 +8,17 @@
 
 > Production secrets removed. This repository is safe for public sharing.
 
+更新记录见 [CHANGELOG.md](./CHANGELOG.md)。
+
 ## 中文
+
+
+## v0.2 升级能力
+
+- 混合检索：SQLite + BM25(FTS5) + 本地向量融合召回
+- 推理层：DeepSeek `deepseek-v4-flash`（可灰度路由）
+- 主链路升级：可进化 / 可纠正 / 可切人格 / 双层蒸馏
+- 新命令：`/ask_plus`、`/feedback`、`/memory_status`
 
 一个面向个人与小团队的 Telegram + Notion 知识机器人。核心能力是把 Notion 内容持续同步到本地索引，再通过 Telegram 指令完成检索、问答与知识蒸馏。
 
@@ -21,6 +31,8 @@
 
 ## 功能清单
 
+- `/goal [目标]` 记录或查看当前协作目标
+- `/reembed [数量]` 触发真实向量重算
 - `/sync` 增量同步 Notion 内容
 - `/sync full` 全量重建索引
 - `/sync_status` 查看后台同步状态

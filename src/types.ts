@@ -16,3 +16,12 @@ export type IndexStore = {
   lastSyncAt: string | null;
   docs: NotionDoc[];
 };
+
+export type Citation = {
+  title: string;
+  url: string;
+  excerpt: string;
+  highlights: string[];
+};
+
+export type DecisionMode = "conservative" | "balanced" | "aggressive";

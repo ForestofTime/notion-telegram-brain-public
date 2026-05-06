@@ -12,6 +12,11 @@ const toInt = (value: string | undefined, fallback: number): number => {
   return Number.isFinite(n) && n > 0 ? n : fallback;
 };
 
+const toFloat = (value: string | undefined, fallback: number): number => {
+  const n = Number.parseFloat(value ?? "");
+  return Number.isFinite(n) ? n : fallback;
+};
+
 const allowedUsers = (process.env.TELEGRAM_ALLOWED_USERS ?? "")
   .split(",")
   .map((s) => s.trim())
@@ -29,9 +34,18 @@ export const config = {
   allowedUsers,
   syncIntervalMinutes: toInt(process.env.SYNC_INTERVAL_MINUTES, 30),
   dataFile: (process.env.DATA_FILE ?? "./data/notion-index.json").trim(),
+  sqliteFile: (process.env.SQLITE_FILE ?? "./data/notion-brain.db").trim(),
   resultsPerPage: toInt(process.env.RESULTS_PER_PAGE, 5),
   telegramMode: ((process.env.TELEGRAM_MODE ?? "auto").trim().toLowerCase() as
     | "auto"
     | "polling"
-    | "sync-only")
+    | "sync-only"),
+  llmProvider: ((process.env.LLM_PROVIDER ?? "deepseek").trim().toLowerCase() as "deepseek"),
+  deepseekApiKey: process.env.DEEPSEEK_API_KEY?.trim() ?? "",
+  deepseekModel: (process.env.DEEPSEEK_MODEL ?? "deepseek-v4-flash").trim(),
+  llmRoute: ((process.env.LLM_ROUTE ?? "hybrid").trim().toLowerCase() as "legacy" | "hybrid" | "llm_first"),
+  llmTimeoutMs: toInt(process.env.LLM_TIMEOUT_MS, 25000),
+  llmMaxRetries: toInt(process.env.LLM_MAX_RETRIES, 3),
+  llmTemperature: toFloat(process.env.LLM_TEMPERATURE, 0.2),
+  retrievalTopN: toInt(process.env.RETRIEVAL_TOP_N, 8)
 };

@@ -1,5 +1,5 @@
 import { searchDocs } from "./search.js";
-import type { NotionDoc } from "./types.js";
+import type { Citation, DecisionMode, NotionDoc } from "./types.js";
 
 type Evidence = {
   title: string;
@@ -16,6 +16,11 @@ export type QAResult = {
   sources: Array<{ title: string; url: string }>;
   codeBlock?: string;
   codeLang?: string;
+  confidence?: "high" | "medium" | "low";
+  citations?: Citation[];
+  decisionMode?: DecisionMode;
+  riskBoundary?: string;
+  nextActions?: string[];
 };
 
 const normalize = (s: string | undefined | null): string => (s ?? "").toLowerCase().replace(/\s+/g, " ").trim();
